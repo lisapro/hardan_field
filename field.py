@@ -195,37 +195,42 @@ def plot_brom_sed(var_brom,axis):
                       linewidth = 0.3,zorder = 1 ) 
             
                      
-figure1 = plt.figure(figsize=(8.27, 11.69), dpi=150) #figure(figsize=(5,8), dpi= 100)
+figure1 = plt.figure(figsize=(11.69, 8.27), dpi=150) #figure(figsize=(5,8), dpi= 100)
 figure1.set_facecolor('white') # specify background color
-gs = gridspec.GridSpec(4,3)   # define 2 subplots, (i.e. y=2,x=1)
-gs.update(left = 0.1,right = 0.97, 
+
+gs0 = gridspec.GridSpec(2, 6)
+#gs1 = gridspec.GridSpecFromSubplotSpec(2, 3, subplot_spec=gs0[0])
+#gs2 = gridspec.GridSpecFromSubplotSpec(2, 3, subplot_spec=gs0[1])
+
+gs0.update(left = 0.07,right = 0.97, 
           bottom = 0.07, top = 0.95,
-          wspace = 0.25, hspace= 0.25)         # shift figure from left boundary
+          wspace = 0.25, hspace= 0.15)         # shift figure from left boundary
 
 
-ax = figure1.add_subplot(gs[0,0]) 
+ax = figure1.add_subplot(gs0[0,0]) 
 ax.set_ylabel('Depth, m')
 
-ax1 = figure1.add_subplot(gs[1,0])
+ax1 = figure1.add_subplot(gs0[1,0])
 ax1.set_ylabel('Depth, cm')
 
-ax2 = figure1.add_subplot(gs[0,1]) 
-ax3 = figure1.add_subplot(gs[1,1])
+ax2 = figure1.add_subplot(gs0[0,1]) 
+ax3 = figure1.add_subplot(gs0[1,1])
 
-ax4 = figure1.add_subplot(gs[0,2]) 
-ax5 = figure1.add_subplot(gs[1,2])
+ax4 = figure1.add_subplot(gs0[0,2]) 
+ax5 = figure1.add_subplot(gs0[1,2])
 
-ax6 = figure1.add_subplot(gs[2,0])
-ax6.set_ylabel('Depth, m')
 
-ax7 = figure1.add_subplot(gs[3,0]) 
-ax7.set_ylabel('Depth, cm')
+ax6 = figure1.add_subplot(gs0[0,3])
+#ax6.set_ylabel('Depth, m')
 
-ax8 = figure1.add_subplot(gs[2,1])
-ax9 = figure1.add_subplot(gs[3,1])
+ax7 = figure1.add_subplot(gs0[1,3]) 
+#ax7.set_ylabel('Depth, cm')
 
-ax10 = figure1.add_subplot(gs[2,2])
-ax11 = figure1.add_subplot(gs[3,2])
+ax8 = figure1.add_subplot(gs0[0,4])
+ax9 = figure1.add_subplot(gs0[1,4])
+
+ax10 = figure1.add_subplot(gs0[0,5])
+ax11 = figure1.add_subplot(gs0[1,5])
 
 
 letters = ['(A)','(B)','(C)','(D)','(E)','(F)']
@@ -233,7 +238,7 @@ letters = ['(A)','(B)','(C)','(D)','(E)','(F)']
 n = 0
 for axis in (ax1,ax3,ax5,ax7,ax9,ax11): 
     #axis.yaxis.set_label_coords(-0.1, 0.6)
-    axis.text(-0.25, -0.15, letters[n], transform=axis.transAxes , 
+    axis.text(-0.2, -0.12, letters[n], transform=axis.transAxes , 
             size = BIGGER_SIZE) #, weight='bold')      
     n=n+1
 
@@ -244,6 +249,7 @@ def plot_all(var_brom,var_water,var_sed1,var_sed2,title,axis,axis1):
     
 
     axis.set_ylim(310,0)
+    #axis.xaxis.set_ticks_position('top') 
     axis1.set_ylim(3.1,-3.1)  #   axis1.set_ylim(5,-5) 
     water_ticks = np.arange(0, 310, 100)                                             
     swi_ticks = np.arange(-3, 3, 1.5)   
@@ -265,6 +271,7 @@ def plot_all(var_brom,var_water,var_sed1,var_sed2,title,axis,axis1):
     axis.set_title(title)
     
 # ------------- FINALLY PLOT ! ------------
+
 plot_all(o2_brom,o2,None,None,r'$ O_2\ \mu  M $',ax,ax1) 
 plot_all(po4_brom,po4,po4199,po4200,r'$ PO_4\ \mu  M $',ax2,ax3)
 plot_all(no3_brom,no3,no3199,no3200,r'$ NO_3\ \mu  M $',ax4,ax5)
@@ -274,14 +281,12 @@ plot_all(alk_brom,alk,alk199,alk200,r'$ Alk\ \mu  M $',ax8,ax9)
 plot_all(tic_brom,tic,tic199,tic200,r'$ DIC\ \mu  M $',ax10,ax11)
 
 
-
-
 script_dir = os.path.dirname(__file__)
 results_dir = os.path.join(script_dir, 'Results/')    
 if not os.path.isdir(results_dir):
     os.makedirs(results_dir)
     
-plt.savefig(results_dir+'Figure5'+'.eps',
+plt.savefig(results_dir+'Figure5'+'.eps',#png'
             facecolor=figure1.get_facecolor(),
             edgecolor='none')
 #plt.show()
