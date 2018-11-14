@@ -169,9 +169,9 @@ fig1.set_facecolor('white') # specify background color
 
 gs = gridspec.GridSpec(2, 6)
 
-gs.update(left = 0.07,right = 0.97, 
+gs.update(left = 0.07,right = 0.99, 
           bottom = 0.07, top = 0.95,
-          wspace = 0.25, hspace= 0.15)
+          wspace = 0.3, hspace= 0.15)
 
 
 ax = fig1.add_subplot(gs[0,0]) 
@@ -225,8 +225,8 @@ def plot_all(var_brom,var_water,var_sed1,var_sed2,title,axis,axis1):
     axis1.axhspan(5, 0,color='#dcc196',
                  alpha = 0.4, label = "sediment")        
      
-    #plot_brom(var_brom,axis)
-    #plot_brom_sed(var_brom,axis1)            
+    plot_brom(var_brom,axis)
+    plot_brom_sed(var_brom,axis1)            
     plot_water(var_water,axis,title)
     plot_sed(var_sed1,depth200,axis1)
     plot_sed(var_sed2,depth199,axis1)
@@ -247,9 +247,9 @@ results_dir = os.path.join(script_dir, 'Results/')
 if not os.path.isdir(results_dir):
     os.makedirs(results_dir)
     
-#plt.savefig(results_dir+'Figure5'+'.eps',#png'
-#           facecolor=fig1.get_facecolor(),
-#            edgecolor='none')
-plt.show()
+plt.savefig(results_dir+'Figure1'+'.png', #'.eps'
+           facecolor=fig1.get_facecolor(),
+            edgecolor='none')
+#plt.show()
 #plt.clf()
 #print ('ferdig!')

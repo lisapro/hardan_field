@@ -70,13 +70,13 @@ def plot_farm(var_brom,title,axis):
                 al = 1
             else: 
                 c = col_base
-                al = 0.2     
+                al = 0.1     
             axis.plot(var_brom[day,:,n],sed_depth_brom,
                       color = c,alpha = al,linewidth = 0.5) 
 
     axis.scatter(df['n_FF'],df.depth,
                  zorder = 10,c = 'k',alpha = al)
-    axis.plot(df_mean['n_NF'],df_mean.index,
+    axis.plot(df_mean['n_FF'],df_mean.index,
               'ko--',zorder = 10)    
 def plot_base(var_brom,title,axis):  
     axis.set_title(title) 
@@ -122,10 +122,10 @@ for a in axes:
     a.set_ylim(7.5,-10)
     
 plot_farm(pomr_brom,r'$ POMR\ Farm\ \mu  M $',ax) 
-plot_base(pomr_brom,r'$ POMR\ Baseline \ \mu  M $',ax1) 
+plot_base(pomr_brom,r'$ POMR\ Not Farm \ \mu  M $',ax1) 
 
 plot_farm(domr_brom,r'$ DOMR\ Farm\ \mu  M $',ax2) 
-plot_base(domr_brom,r'$ DOMR\ Baseline \ \mu  M $',ax3) 
+plot_base(domr_brom,r'$ DOMR\ Not Farm \ \mu  M $',ax3) 
 
 
 
@@ -134,4 +134,7 @@ results_dir = os.path.join(script_dir, 'Results/')
 if not os.path.isdir(results_dir):
     os.makedirs(results_dir)
     
+plt.savefig(results_dir+'Figure2'+'.png', #'.eps'
+           facecolor=fig1.get_facecolor(),
+            edgecolor='none')    
 plt.show()
