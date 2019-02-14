@@ -39,8 +39,8 @@ len_i = len(i_brom)
 col_farm = '#842967'    
 col_farm_dark = '#571b44'
 col_base = '#5a773d'
-col_base_dark = '#465d30'
-
+col_base_dark = '#122212'
+#c_base_line = '#122212'
 step = int(len_time/10)
 
 path = 'data/Jellyfarm/SedCharacteristics_Hardangerfj_BCSamples_eya.xlsx'
@@ -77,18 +77,25 @@ def plot_pomr(var_brom,title):
                       color = c,alpha = al,linewidth = l,zorder = 1) 
             
     ax.scatter(df['n_FF'],df.depth,s = 35,
-                 zorder = 10,c = '#c03c96',edgecolor = 'k',alpha = 0.7,label = 'field "Near Farm"')
+                 zorder = 10,c = col_farm,edgecolor = 'k',alpha = 1,label = 'field "Near Farm"')
     ax.scatter(df['n_NF'],
                  df.depth,zorder = 10,s = 35,
-                 c = '#779e52',alpha = 0.7,edgecolor = 'k',label = 'field "Not Farm"')    
-    
-    ax.plot(df_mean['n_FF'],df_mean.index,c = col_farm_dark,markeredgecolor = 'k', marker = 'o',label = 'field "Near Farm" \nmean',
-              zorder = 10,markersize = 6) 
+                 c = col_base,alpha = 0.7,edgecolor = 'k',label = 'field "Not Farm"')  
+      
+    ax.scatter(df_mean['n_FF'],df_mean.index,c = col_farm,
+               edgecolor = 'k',label = 'field "Near Farm" \nmean',
+              zorder = 10,s = 36) 
            
-    ax.plot(df_mean['n_NF'],df_mean.index,markeredgecolor = 'k', c = col_base_dark, marker = 'o',
-              markersize = 6,zorder = 10,label = 'field "Not Farm" \nmean')
+    ax.scatter(df_mean['n_NF'],df_mean.index,edgecolor = 'k', c = col_base, 
+              s = 36,zorder = 10,label = 'field "Not Farm" \nmean') 
+       
+    ax.plot(df_mean['n_FF'],df_mean.index,c = col_farm_dark,label = 'field "Near Farm" \nmean',
+              zorder = 5,linestyle = '--') 
+           
+    ax.plot(df_mean['n_NF'],df_mean.index, c = col_base_dark,linestyle = '--',
+              zorder = 5,label = 'field "Not Farm" \nmean')
     
-    ax.legend()        
+            
 def plot_o2(var_brom,title,axis):  
     axis.set_title(title)    
     for day in range(0,len_time,step):          
@@ -96,9 +103,9 @@ def plot_o2(var_brom,title,axis):
             c = col_base
             al = 0.1     
             axis.plot(var_brom[day,:,n],sed_depth_brom,
-                      color = c,alpha = al,linewidth = 0.5)         
+                      color = c,alpha = al,linewidth = 0.5,zorder = 1)         
         axis.plot(var_brom[day,:,19],sed_depth_brom,
-                color = col_farm_dark,alpha = 1,linewidth = 1,zorder = 10,label = 'Model Data') 
+                color = col_farm,alpha = 1,linewidth = 2,zorder = 2,label = 'Model Data') 
          
 
                                           
@@ -119,7 +126,7 @@ for a in axes:
     a.axhspan(10,0,color= col_sed, 
               alpha = 0.4)
     a.set_ylabel('Depth, cm')
-    a.set_ylim(10,-10)
+    a.set_ylim(4,-8)
     
 
 plot_pomr(pomr_brom,r'$ POMR\ \mu  M $')
@@ -128,8 +135,9 @@ plot_pomr(pomr_brom,r'$ POMR\ \mu  M $')
 def get_df(path):
     d = pd.read_excel(path,skiprows = 1,usecols = [1,4,7],
                       names = ['depth','time','o2'])
-    d.depth = d.depth / -1000
-    d = d.resample('30s', on='time').mean()   
+    d.depth = d.depth / -10000
+    d = d.resample('30s', on='time').mean()  
+    d.o2 = d['o2'].where(d.o2 >= 0, 0) 
     return d
     
 df_o2 = get_df('data/Jellyfarm/AKS193_1_FF.xlsx')
@@ -138,23 +146,26 @@ df_o2_2_nf = get_df('data/Jellyfarm/AKS189_3_NF.xlsx')
 df_o2_2 = get_df('data/Jellyfarm/AKS193_2_FF.xlsx')
 
 
-def int_and_plot(xx,yy,min,max,col):
+def int_and_plot(xx,yy,col,col_line):
 
     f = interpolate.interp1d(yy,xx, assume_sorted = False)
-    ynew = np.arange(min,max,1)
+    ynew = np.arange(np.min(yy),np.max(yy),0.3)
     xnew = f(ynew) 
     
     plot_o2(o2_brom,r'$ O_2\  \mu  M $',ax1) 
-    ax1.plot(xnew,ynew, zorder = 10, marker = 'o',markersize = 6,# s = 45,
-                     c = col,markeredgecolor = 'k',
-                     alpha = 0.7,label = 'field "Near Farm"')
+    ax1.plot(xnew,ynew, zorder =5, linestyle= '--',# s = 45,
+                     c = col_line,
+                     alpha = 1,label = 'field "Near Farm"')
+    ax1.scatter(xnew,ynew, zorder = 10, s = 36, 
+                     c = col,edgecolor = 'k',
+                     alpha = 1,label = 'field "Near Farm"')    
     
-int_and_plot(df_o2_2.o2,df_o2_2.depth,-9,10,col_farm)    
-int_and_plot(df_o2.o2,df_o2.depth,-7,10,col_farm) 
-int_and_plot(df_o2_nf.o2,df_o2_nf.depth,-7,10,col_base) 
-int_and_plot(df_o2_2_nf.o2,df_o2_2_nf.depth,-7,10,col_base) 
+int_and_plot(df_o2_2.o2,df_o2_2.depth,col_farm,col_farm_dark)    
+int_and_plot(df_o2.o2,df_o2.depth,col_farm,col_farm_dark) 
+int_and_plot(df_o2_nf.o2,df_o2_nf.depth,col_base,col_base_dark) 
+int_and_plot(df_o2_2_nf.o2,df_o2_2_nf.depth,col_base,col_base_dark) 
 
- 
+#ax.legend() 
 plt.show()
 #plt.savefig(results_dir+'Figure2'+'.png', #'.eps'
 #           facecolor=fig1.get_facecolor(),
