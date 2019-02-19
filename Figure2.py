@@ -3,24 +3,31 @@ Created on 19. july 2017
 
 @author: ELP
 '''
-
 import os,sys
+print (sys.version) 
+
 from netCDF4 import Dataset
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import tkinter as tk 
-from tkinter.filedialog import askopenfilename 
+#import tkinter as tk 
+#from tkinter.filedialog import askopenfilename 
 import seaborn as sns
 import pandas as pd
 from scipy import interpolate
 
 sns.set()
-root = tk.Tk()
-root.withdraw()
+#root = tk.Tk()
+#root.withdraw()
 
 fname = (
-    r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out.nc')
+    r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_1X.nc') 
+        #
+    #BROM_Hardangerfjord_out_2X.nc 
+    #BROM_Hardangerfjord_out_3X.nc 
+    #BROM_Hardangerfjord_out_5X.nc 
+    #BROM_Hardangerfjord_out_10X.nc 
+
 
 fh =  Dataset(fname) 
 depth_brom = np.array(fh.variables['z'][:])
@@ -136,7 +143,7 @@ def get_df(path):
     d = pd.read_excel(path,skiprows = 1,usecols = [1,4,7],
                       names = ['depth','time','o2'])
     d.depth = d.depth / -10000
-    d = d.resample('30s', on='time').mean()  
+    #d = d.resample('30s', on='time').mean()  
     d.o2 = d['o2'].where(d.o2 >= 0, 0) 
     return d
     
