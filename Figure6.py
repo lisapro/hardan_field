@@ -24,7 +24,7 @@ def get_z(index,col):
 
 def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
-    cmap = sns.cubehelix_palette(n_colors = 1,as_cmap=True)
+    
     #sns.palplot(sns.color_palette("cubehelix", 8)) 
     z_baseline = get_z(param,util.baseline_col).T
     z_farm = get_z(param,util.farm_col).T
@@ -37,7 +37,7 @@ def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
     X,Y = np.meshgrid(x,y[:sed2])  
     X_sed,Y_sed = np.meshgrid(x,y_sed[sed2:]) 
-    
+    cmap = sns.cubehelix_palette(n_colors = 1,as_cmap=True)
     CS_base = axis.contourf(X,Y, z_baseline[:sed2,:], nlev, extend="both",cmap = cmap)
     CS_farm = axis1.contourf(X,Y, z_farm[:sed2,:], nlev, extend="both")
     CS_base_sed = axis2.contourf(X_sed,Y_sed, z_baseline[sed2:,:], nlev, extend="both")
