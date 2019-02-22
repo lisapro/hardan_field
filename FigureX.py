@@ -4,25 +4,20 @@ Created on 19. july 2017
 @author: ELP
 '''
 import os,sys
-print (sys.version) 
 
 from netCDF4 import Dataset
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-#import tkinter as tk 
-#from tkinter.filedialog import askopenfilename 
 import seaborn as sns
 import pandas as pd
 from scipy import interpolate
 
 sns.set()
-#root = tk.Tk()
-#root.withdraw()
+
 
 fname = (
     r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_1X.nc') 
-        #
     #BROM_Hardangerfjord_out_2X.nc 
     #BROM_Hardangerfjord_out_3X.nc 
     #BROM_Hardangerfjord_out_5X.nc 
@@ -60,11 +55,11 @@ df = df[:-1]
 df.category = df.category.fillna(method='ffill')
 df.depth_str = df.depth_str.fillna(method='ffill')   
 
-depth = []
-for n in df.depth_str:
-    d = depth_dict[n] 
-    depth.append(d)     
-df['depth'] = depth 
+df['depth'] = [depth_dict[n] for n in df.depth_str ]
+#for n in df.depth_str:
+#    d = depth_dict[n] 
+#    depth.append(d)   
+#df['depth'] = depth 
 
 df_mean = df.groupby('depth').mean()
                  

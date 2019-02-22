@@ -14,6 +14,7 @@ import matplotlib.gridspec as gridspec
 import pandas as pd
 import xarray as xr 
 from scipy import interpolate
+from util import path_brom1
 
 plt.style.use('bmh') 
 
@@ -82,9 +83,7 @@ a = 1
 ln  = 0.4
 ln_field = 1
 
-fname = (
-     r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_1X.nc')
-df_brom = xr.open_dataset(fname)
+df_brom = xr.open_dataset(path_brom1)
 depth_brom = df_brom['z'].values
 sed_depth_brom  = (depth_brom - depth_brom[15])*100
 
