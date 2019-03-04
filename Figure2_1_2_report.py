@@ -34,7 +34,6 @@ def get_levels(arr1,arr2):
 
 def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
-    
     #sns.palplot(sns.color_palette("cubehelix", 8)) 
     z_farm1 = get_z(df_brom,param,util.baseline_col).T
     z_farm3 = get_z(df_brom_3x, param,util.farm_col).T
