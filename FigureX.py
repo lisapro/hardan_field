@@ -12,10 +12,10 @@ import matplotlib.gridspec as gridspec
 import seaborn as sns
 import pandas as pd
 from scipy import interpolate
-
+import util
 sns.set()
 
-
+savefig = True
 fname = (
     r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_1X.nc') 
     #BROM_Hardangerfjord_out_2X.nc 
@@ -62,11 +62,13 @@ df['depth'] = [depth_dict[n] for n in df.depth_str ]
 #df['depth'] = depth 
 
 df_mean = df.groupby('depth').mean()
-                 
+al = 0.5     
+l = 0.3
+
 def plot_pomr(var_brom,title):  
     ax.set_title(title)    
-    for day in range(0,len_time,step):          
-        for n in range(0,len_i): 
+    for day in range(util.start_day,util.stop_day,2):          
+        '''for n in range(0,len_i): 
             if n == 19: # 19 is farm
                 c = col_farm
                 al = 1
@@ -74,10 +76,13 @@ def plot_pomr(var_brom,title):
             else: 
                 c = col_base
                 al = 0.5    
-                l = 0.5
-            ax.plot(var_brom[day,:,n],sed_depth_brom,
-                      color = c,alpha = al,linewidth = l,zorder = 1) 
-            
+                l = 0.5'''
+                
+        ax.plot(var_brom[day,:,19],sed_depth_brom,
+                      color = col_farm,alpha = al,linewidth = l,zorder = 1) 
+        ax.plot(var_brom[day,:,0],sed_depth_brom,
+                      color = col_base,alpha = al,linewidth = l,zorder = 1)             
+
     ax.scatter(df['n_FF'],df.depth,s = 35,
                  zorder = 10,c = col_farm,edgecolor = 'k',alpha = 1,label = 'field "Near Farm"')
     ax.scatter(df['n_NF'],
@@ -100,14 +105,14 @@ def plot_pomr(var_brom,title):
             
 def plot_o2(var_brom,title,axis):  
     axis.set_title(title)    
-    for day in range(0,len_time,step):          
-        for n in range(0,len_i,1): 
-            c = col_base
-            al = 0.1     
-            axis.plot(var_brom[day,:,n],sed_depth_brom,
-                      color = c,alpha = al,linewidth = 0.5,zorder = 1)         
+    for day in range(util.start_day,util.stop_day,2):          
+        #for n in range(0,len_i,1): 
+        #    c = col_base
+        #    al = 0.1     
+        axis.plot(var_brom[day,:,0],sed_depth_brom,
+                      color = col_base, alpha = 1,linewidth = 0.5,zorder = 1)         
         axis.plot(var_brom[day,:,19],sed_depth_brom,
-                color = col_farm,alpha = 1,linewidth = 2,zorder = 2,label = 'Model Data') 
+                color = col_farm, alpha = 1,linewidth = 2,zorder = 2,label = 'Model Data') 
          
 
                                           
@@ -128,7 +133,7 @@ for a in axes:
     a.axhspan(10,0,color= col_sed, 
               alpha = 0.4)
     a.set_ylabel('Depth, cm')
-    a.set_ylim(4,-8)
+    a.set_ylim(4,-3)
     
 
 plot_pomr(pomr_brom,r'$ POMR\ \mu  M $')
@@ -168,7 +173,10 @@ int_and_plot(df_o2_nf.o2,df_o2_nf.depth,col_base,col_base_dark)
 int_and_plot(df_o2_2_nf.o2,df_o2_2_nf.depth,col_base,col_base_dark) 
 
 #ax.legend() 
-plt.show()
-#plt.savefig(results_dir+'Figure2'+'.png', #'.eps'
-#           facecolor=fig1.get_facecolor(),
-#            edgecolor='none')   
+
+
+if savefig == True:
+    plt.savefig('Results/'+'FigureO2_POMR'+'.png',
+                edgecolor='none')   
+else: 
+    plt.show()

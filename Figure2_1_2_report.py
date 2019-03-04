@@ -1,0 +1,168 @@
+'''
+Scrip to plot Figure 6 
+Time-Series Profle
+Baseline vs Farm 1x 
+'''
+import matplotlib.gridspec as gridspec
+import matplotlib.pyplot as plt
+import numpy as np 
+import xarray as xr 
+import util
+import numpy.ma as ma
+from matplotlib import ticker
+import matplotlib.dates as mdates
+from pandas.plotting import register_matplotlib_converters
+import seaborn as sns
+sns.set_style("whitegrid")
+register_matplotlib_converters()
+
+
+df_brom = xr.open_dataset(util.path_brom1)
+df_brom_3x = xr.open_dataset(util.path_brom3x)
+
+
+
+def get_z(df,index,col):
+    return df[index][util.dist_day,:,:].values
+
+def get_levels(arr1,arr2):
+    nlev = 200
+    vmin = np.min((arr1,arr2))
+    vmax =  np.max((arr1,arr2))
+    return np.linspace(vmin,vmax,nlev)
+
+
+def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
+
+    
+    #sns.palplot(sns.color_palette("cubehelix", 8)) 
+    z_farm1 = get_z(df_brom,param,util.baseline_col).T
+    z_farm3 = get_z(df_brom_3x, param,util.farm_col).T
+    #print ('shape z ', z_farm1.shape)
+    x = df_brom['i'].values
+    # print (x[19])
+    x = x - x[19]
+    y = df_brom.z.values
+    #print (x.shape,y.shape) #41 column, 23 depths
+    sed = 15 
+    y_sed = ((y - y[sed])*100)   
+    sed2 = 12
+    
+    sed_levels = get_levels(z_farm3[:,sed2:],z_farm1[:,sed2:]) 
+    levels = get_levels(z_farm3[:,:sed2],z_farm1[:,:sed2]) 
+    #vmin = np.min((np.min(z_baseline[:sed2,:]),np.min(z_farm[:sed2,:])))
+    #vmax = np.max((z_baseline[:sed2,:],z_farm[:sed2,:]))
+    #levels = np.linspace(vmin,vmax,nlev)
+
+    X,Y = np.meshgrid(x,y[:sed2])  
+    X_sed,Y_sed = np.meshgrid(x,y_sed[sed2:]) 
+    cmap = plt.get_cmap('jet') #sns.cubehelix_palette(n_colors = 1,as_cmap=True) #'jet') #
+    # print (param,vmin,vmax)
+    CS_1 = axis.contourf(X,Y, z_farm1[:,:sed2].T, levels = levels,extend="both",cmap = cmap) #
+    CS_3 = axis1.contourf(X,Y, z_farm3[:,:sed2].T, levels = levels,extend="both",cmap = cmap) #
+    axis1.xaxis.set_major_locator(ticker.AutoLocator())
+    CS_1_sed = axis2.contourf(X_sed,Y_sed, z_farm1[:,sed2:].T, levels = sed_levels, extend="both",cmap = cmap)
+    CS_3_sed = axis3.contourf(X_sed,Y_sed, z_farm3[:,sed2:].T, levels = sed_levels,extend="both",cmap = cmap)
+
+
+    tick_locator = ticker.MaxNLocator(nbins=4)
+
+    cb = plt.colorbar(CS_3,cax = axis_cb)
+
+    cb.locator = tick_locator
+    cb.update_ticks()
+
+    cb_sed = plt.colorbar(CS_3_sed,cax = axis_cb_sed)
+
+    cb_sed.locator = tick_locator
+    cb_sed.update_ticks()
+
+    axis.set_xticklabels([])
+    axis1.set_xticklabels([])
+    axis.set_ylabel('Depth,m')
+    
+    axis.set_ylim(312,0)
+    axis1.set_ylim(312,0)
+    axis2.set_ylim(5,-5)
+    axis3.set_ylim(5,-5)   
+    axis2.set_ylabel('Depth,cm')
+    
+    #mnths = ['F','M','A','M','J','J','A','S','O','N','D','J']
+    #axis2.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    #axis3.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+
+    axis2.axhline(0,linestyle = '--',linewidth = 0.5,color = 'w')
+    axis3.axhline(0,linestyle = '--',linewidth = 0.5,color = 'w') 
+
+    axis.set_yticks([50,150,250])
+    axis1.set_yticks([50,150,250])
+
+    axis.tick_params(axis='y', pad = 0.01)
+    axis2.tick_params(axis='y', pad = 1)
+
+    #fig.autofmt_xdate()
+
+
+
+fig = plt.figure(figsize=(8.27,11/5*4), dpi=100) 
+
+gs = gridspec.GridSpec(4, 2,width_ratios = [30,1]) 
+gs.update(left = 0.07,right = 0.93, 
+          bottom = 0.04, top = 0.95,
+          wspace = 0.05, hspace= 0.3)
+
+
+h = 0.06
+w = 0.15
+
+gs00 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=gs[0],hspace=h,wspace=w,height_ratios=[3,2]) 
+gs00_cb = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[1], height_ratios=[3,2]) 
+
+gs01 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=gs[2],hspace=h,wspace=w,height_ratios=[3,2]) 
+gs01_cb = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[3],height_ratios=[3,2])
+
+gs02 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=gs[4],hspace=h,wspace=w,height_ratios=[3,2]) 
+gs02_cb = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[5],height_ratios=[3,2])
+
+gs03 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=gs[6],hspace=h,wspace=w,height_ratios=[3,2]) 
+gs03_cb = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[7],height_ratios=[3,2])
+
+#gs04 = gridspec.GridSpecFromSubplotSpec(2, 2, subplot_spec=gs[8],hspace=h,wspace=w,height_ratios=[3,2]) 
+#gs04_cb = gridspec.GridSpecFromSubplotSpec(2, 1, subplot_spec=gs[9],height_ratios=[3,2])
+
+def sbplt(pos): 
+    return fig.add_subplot(pos)
+
+ax,ax1,ax_cb  =   sbplt(gs00[0,0]), sbplt(gs00[0,1]), sbplt(gs00_cb[0])
+ax2,ax3,ax_cb_sed =   sbplt(gs00[1,0]), sbplt(gs00[1,1]), sbplt(gs00_cb[1]) 
+
+ax_1,ax1_1,ax1_cb  =   sbplt(gs01[0,0]), sbplt(gs01[0,1]), sbplt(gs01_cb[0])
+ax2_1,ax3_1, ax1_cb_sed =   sbplt(gs01[1,0]), sbplt(gs01[1,1]), sbplt(gs01_cb[1])
+
+ax_2,ax1_2,ax2_cb  =   sbplt(gs02[0,0]), sbplt(gs02[0,1]), sbplt(gs02_cb[0])
+ax2_2,ax3_2, ax2_cb_sed  =   sbplt(gs02[1,0]), sbplt(gs02[1,1]), sbplt(gs02_cb[1]) 
+
+ax_3,ax1_3,ax3_cb  =   sbplt(gs03[0,0]), sbplt(gs03[0,1]), sbplt(gs03_cb[0])
+ax2_3,ax3_3, ax3_cb_sed  =   sbplt(gs03[1,0]), sbplt(gs03[1,1]), sbplt(gs03_cb[1]) 
+
+
+plot_param('POMR',ax,ax1,ax2,ax3,ax_cb,ax_cb_sed) 
+ax.set_title(r'$POMR\ Farm\ 1x,\ \mu M\ N$')
+ax1.set_title(r'$POMR\ Farm\ 3x,\ \mu M\ N$')
+
+plot_param('O2',ax_1,ax1_1,ax2_1,ax3_1,ax1_cb,ax1_cb_sed) 
+ax_1.set_title(r'$O_2\ Farm\ 1x,\ \mu M\ $')
+ax1_1.set_title(r'$O_2\ Farm\ 3x,\ \mu M\ $')
+
+plot_param('NO3',ax_2,ax1_2,ax2_2,ax3_2,ax2_cb,ax2_cb_sed) 
+ax_2.set_title(r'$NO_3\ Farm\ 1x,\ \mu M\ $')
+ax1_2.set_title(r'$NO_3\ Farm\ 3x,\ \mu M\ $')
+
+plot_param('NH4',ax_3,ax1_3,ax2_3,ax3_3,ax3_cb,ax3_cb_sed) 
+ax_3.set_title(r'$NH_4\  Farm\ 1x,\ \mu M\ $')
+ax1_3.set_title(r'$NH_4\ Farm\ 3x,\ \mu M\ $')
+
+ax1_3.set_xlabel('Distance, m') 
+ax_3.set_xlabel('Distance, m')
+#plt.show()
+plt.savefig('Results/Figure2_1_2_report.png')
