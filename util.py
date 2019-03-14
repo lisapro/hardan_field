@@ -6,7 +6,8 @@ import numpy as np
 path_brom1 = r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_1X.nc'
 path_brom2 = r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_2X.nc'    
 path_brom3 = r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_3X.nc'
-
+path_brom5 = r'E:\Users\EYA\Hardnew\data_Hard\BROM_Hardangerfjord_out_5X.nc'
+    
 start_day = 731
 stop_day = 1096
 dist_day = 831

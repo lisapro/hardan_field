@@ -68,7 +68,11 @@ def plot_param(param,z,axis,axis_cb,axis_sed,axis_cb_sed):
 
     X,Y = np.meshgrid(x,y[:sed2])  
     X_sed,Y_sed = np.meshgrid(x,y_sed[sed2:]) 
-    cmap = plt.get_cmap('gist_earth') #cubehelix') #sns.cubehelix_palette(n_colors = 1,as_cmap=True) #'jet') #
+    import palettable
+    from palettable.colorbrewer.sequential import Blues_8
+    from palettable import cubehelix #Cubehelix
+    cmap = palettable.wesanderson.Zissou_5.mpl_colormap #cubehelix3_16.mpl_colormap #Cubehelix.get_map('cubehelix3_16')
+    #cmap = Cubehelix.cubehelix3_16.mpl_colormap #plt.get_cmap('jet') #'gist_earth') #cubehelix') #sns.cubehelix_palette(n_colors = 1,as_cmap=True) #) #
     # print (param,vmin,vmax)
     CS_1 = axis.contourf(X,Y, z[:,:sed2].T, levels = levels,extend="both",cmap = cmap) 
     CS_1_sed = axis_sed.contourf(X_sed,Y_sed, z[:,sed2:].T, levels = sed_levels,extend="both",cmap = cmap) 
@@ -216,10 +220,12 @@ def fig8():
     [axis.set_ylabel('Depth,m') for axis in [ax00,ax01,ax02,ax03,ax04]]
     [axis.set_ylabel('Depth,cm') for axis in [ax00_sed,ax01_sed,ax02_sed]] 
 
-    plt.savefig('Results/Figure8.png')
-    #plt.show()
+    #plt.savefig('Results/Figure8.png')
+    plt.show()
 
 if __name__ == '__main__':
-    fig7()    
+    #fig7()    
     
-    #fig8()
+    fig8()
+
+    

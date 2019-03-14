@@ -60,7 +60,7 @@ def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
     X,Y = np.meshgrid(x,y[:sed2])  
     X_sed,Y_sed = np.meshgrid(x,y_sed[sed2:]) 
-    cmap = plt.get_cmap('gist_earth') #jet') ##sns.cubehelix_palette(n_colors = 1,as_cmap=True)
+    cmap = plt.get_cmap('jet') ##sns.cubehelix_palette(n_colors = 1,as_cmap=True)
     # print (param,vmin,vmax)
     CS_base = axis.contourf(X,Y, z_baseline[:sed2,:], levels = levels,extend="both",cmap = cmap) #
     CS_farm = axis1.contourf(X,Y, z_farm[:sed2,:], levels = levels,cmap = cmap) #extend="both",
