@@ -1,0 +1,7 @@
+*.png
+*.eps
+data/
+.project
+.vscode/
+hardanger.code-workspace
+.pydevproject
