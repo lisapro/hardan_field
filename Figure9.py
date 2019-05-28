@@ -28,7 +28,7 @@ def make_fig_gs(nrows,ncols):
     gs = gridspec.GridSpec(nrows, ncols) 
     gs.update(left = 0.07,right = 0.9, 
             bottom = 0.08, top = 0.95,
-            wspace = 0.35, hspace= 0.42)
+            wspace = 0.39, hspace= 0.42)
     return gs
 
     
@@ -91,7 +91,8 @@ def plot_param(param,z,axis,axis_cb,axis_sed,axis_cb_sed):
     cb.update_ticks()
 
     cb_sed = plt.colorbar(CS_1_sed,cax = axis_cb_sed,format=ticker.FuncFormatter(fmt))
-    axis_cb_sed.set_aspect(4)
+    axis_cb_sed.set_aspect(3)
+    
     cb_sed.locator = tick_locator
     cb_sed.update_ticks()
 
@@ -139,10 +140,10 @@ def fig9():
 
 
     plot_param('Mn2',get_z(df_brom_3,'Mn2'),ax00,ax00_cb,ax00_sed,ax00_sed_cb) 
-    ax00.set_title(r'$Mn2\ Farm\ 3x,\ \mu M\ N$')   
+    ax00.set_title(r'$Mn2\ Farm\ 3x,\ \mu M\ $')   
 
     plot_param('Mn2',get_z(df_brom_5,'O2'),ax00_1,ax00_1_cb,ax00_1_sed,ax00_1_sed_cb) 
-    ax00_1.set_title(r'$Mn2\ Farm\ 5x, \ \mu M\ N$')
+    ax00_1.set_title(r'$Mn2\ Farm\ 5x,\ \mu M\ $')
 
     plot_param('Fe2',get_z(df_brom_3,'Fe2'),ax01,ax01_cb,ax01_sed,ax01_sed_cb) 
     ax01.set_title(r'$Fe2\ Farm\ 3x,\ \mu M\ $')
