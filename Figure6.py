@@ -16,7 +16,6 @@ import seaborn as sns
 sns.set_style("whitegrid")
 register_matplotlib_converters()
 
-
 df_brom = xr.open_dataset(util.path_brom1)
 
 def get_z(index,col):
@@ -31,16 +30,13 @@ def get_levels(arr1,arr2):
 
 def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
-    
     #sns.palplot(sns.color_palette("cubehelix", 8)) 
-
     z_baseline = get_z(param,util.baseline_col).T
     if param == 'Phy':
         z_farm = get_z(param,16).T
     else:     
         z_farm = get_z(param,util.farm_col).T
     #z_farm = get_z(param,util.farm_col).T
-
     
     x = df_brom.time[util.start_day:util.stop_day].values
     y = df_brom.z.values
@@ -48,15 +44,12 @@ def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
     y_sed = ((y - y[sed])*100)   
     sed2 = 13
     
-
     sed_levels = get_levels(z_baseline[sed2:,:],z_farm[sed2:,:]) 
     if param == 'Phy': 
         levels = np.linspace(0,7,util.nlev)   
     else:    
         levels = get_levels(z_baseline[:sed2,:],z_farm[:sed2,:]) 
-    #vmin = np.min((np.min(z_baseline[:sed2,:]),np.min(z_farm[:sed2,:])))
-    #vmax = np.max((z_baseline[:sed2,:],z_farm[:sed2,:]))
-    #levels = np.linspace(vmin,vmax,nlev)
+
 
     X,Y = np.meshgrid(x,y[:sed2])  
     X_sed,Y_sed = np.meshgrid(x,y_sed[sed2:]) 
@@ -107,15 +100,12 @@ def plot_param(param,axis,axis1,axis2,axis3,axis_cb,axis_cb_sed):
 
     #fig.autofmt_xdate()
 
-
-
 fig = plt.figure(figsize=(8.27,11), dpi=100) 
 
 gs = gridspec.GridSpec(5, 2,width_ratios = [30,1]) 
 gs.update(left = 0.07,right = 0.93, 
           bottom = 0.04, top = 0.95,
           wspace = 0.05, hspace= 0.3)
-
 
 h = 0.06
 w = 0.15
@@ -154,8 +144,6 @@ ax2_3,ax3_3, ax3_cb_sed  =   sbplt(gs03[1,0]), sbplt(gs03[1,1]), sbplt(gs03_cb[1
 
 ax_4,ax1_4,ax4_cb  =   sbplt(gs04[0,0]), sbplt(gs04[0,1]), sbplt(gs04_cb[0])
 ax2_4,ax3_4, ax4_cb_sed  =   sbplt(gs04[1,0]), sbplt(gs04[1,1]), sbplt(gs04_cb[1]) 
-
-
 
 plot_param('Phy',ax,ax1,ax2,ax3,ax_cb,ax_cb_sed) 
 ax.set_title(r'$Phy\ baseline\ \mu M\ N$')
