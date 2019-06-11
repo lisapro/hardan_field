@@ -5,3 +5,4 @@ data/
 .vscode/
 hardanger.code-workspace
 .pydevproject
+__pycache__/

@@ -22,11 +22,6 @@ plt.rcParams['xtick.top'] =  True
         Data from the Brom are plotted from start_day to stop_day,
         For 2 columns: Baseline and "Farm"
 '''
-# Last modelled year 
-#start_day = 731 + 167
-#stop_day = 731 + 259 #1096
-#baseline_col = 0
-#farm_col = 19
 
 # Change to True if you want to save figure 
 save = True
@@ -41,7 +36,6 @@ plt.rc('axes', labelsize = bigger_size)   # fontsize of the x and y labels
 plt.rc('xtick', labelsize = bigger_size)   # fontsize of the tick labels
 plt.rc('ytick', labelsize = bigger_size)   # fontsize of the tick labels
 plt.rc('legend', fontsize = small_size)   # legend fontsize
-
 
 
 #Observations
@@ -73,11 +67,12 @@ nh4199 = [100.,114.2857143,145.7142857,107.1428571,92.85714286]
 
 colr1 = '#ff8800'
 #colr_base = '#2e3236'
-colr_base_field = '#519344'
-colr_farm = '#c75641'
+colr_base = '#519344'
+colr_farm = '#D37968'
+colr_farm_0 = '#C74441'
 colr_mid = "#ff8f0f"
 colr_mid2 = "#f4f441"
-a = 0.4
+a = 0.6
 ln  = 1.2
 ln_field = 1
 
@@ -108,7 +103,7 @@ def int_and_plot(axis,xx,yy,col,col_line,addlabel):
     ynew = np.arange(np.min(yy),np.max(yy),0.3)
     xnew = f(ynew) 
     if addlabel == True:   
-        if col == colr_base_field:
+        if col == colr_base:
             label  = '300-1000m \nfrom farm'
         else: 
             label = '50m \nfrom farm'
@@ -127,14 +122,13 @@ def int_and_plot(axis,xx,yy,col,col_line,addlabel):
                             c = col,edgecolor = 'k',
                             alpha = 1)    
 
-
 # plot Observations data water  
 def plot_water(var,axis,title):
 
     if title == r'$ DIC\ \mu  M $' or title == r'$ Alk\ \mu  M $' :
-        axis.scatter(var,tic_depth,color = colr_base_field,
+        axis.scatter(var,tic_depth,color = colr_base,
                      zorder=10,edgecolors='k')
-        axis.plot(var,tic_depth,'--',color ='k',alpha = 0.3,linewidth = ln_field)                                            
+        #axis.plot(var,tic_depth,'--',color ='k',alpha = 0.3,linewidth = ln_field)                                            
     else: 
         d = df[['Nst/',var,'Pressure']]
         groups = d.groupby('Nst/')
@@ -149,95 +143,63 @@ def plot_water(var,axis,title):
                         zorder=10,edgecolors='k')                 
             else:
                 axis.scatter(v,p, 
-                        color = colr_base_field, linewidth = 0.7,
+                        color = colr_base, linewidth = 0.7,
                         zorder=10,edgecolors='k') 
-                axis.plot(v,p, '--',color = 'k', alpha = 0.3,
-
-            linewidth = ln_field)                      
+                #axis.plot(v,p, '--',color = 'k', alpha = 0.3,linewidth = ln_field)                      
  
 # plot Observations data sediments  
 def plot_sed(var,var_depth,axis,addlabel): 
-
     if var != None :
-        if addlabel == True:    
-            axis.scatter(var,var_depth,color = colr_base_field,linewidth = 0.7,
-            edgecolors ='k',zorder=10,label = 'Observartions \nbaseline')      
-        else:  
-            axis.scatter(var,var_depth,color = colr_base_field,linewidth = 0.7,
-            edgecolors ='k',zorder=10)    
-
         axis.plot(var,var_depth,'--',color = 'k', alpha = 0.3,
         linewidth = ln_field)
+        if addlabel == '500m \nfrom farm':    
+            s = axis.scatter(var,var_depth,color = colr_base,linewidth = 0.7,marker = "s",
+            edgecolors ='k',zorder=11,label = addlabel)      
+        else:  
+            s = axis.scatter(var,var_depth,color = colr_base,linewidth = 0.7,marker = '*',
+            edgecolors ='k',zorder=11,label = addlabel)    
+        return s 
 
 # plot model data water          
 def plot_brom(var_brom,axis,is_sed): 
-    df = df_brom.sel(time=slice('2015-07-01', '2015-10-01'))     
-    df = df.where(df.time.dt.dayofyear % 10 == 0,drop = True)
-    df['i_norm'] = df.i - df.i[19]    
-
+    df = df_brom.sel(time=slice('2016-07-15', '2016-11-30'))  
+    norm = df.i[19].values
+    sed_depth = df.z[15].values
+   
+    #df = df.where(df.time.dt.dayofyear % 10 == 0,drop = True)
+    df['i_norm'] = df.i - norm   
     if is_sed == True:
         df['z_sed'] = (df.z - df.z[15])*100            
         df = df.where(df.z_sed > -10, drop = True)    
         sed = df.z_sed.values
-
     elif is_sed == False:  
         df = df.where(df.z < 300., drop = True)    
       
-    v_farm = df.where(df['i_norm'] >= -50. , drop = True)
-    v_farm = v_farm.where(v_farm['i_norm'] <= 50., drop = True)
-    v_farm = v_farm[var_brom]
+    v_farm_0  = df.where(df['i_norm'] == 0. , drop = True)[var_brom]
+    v_farm_50 = df.where(((df['i_norm'] <= 50.) & (df['i_norm'] >= 25.)) , drop = True)[var_brom]
+    v_mid  = df.where(((df['i_norm'] >= 75.)&(df['i_norm'] <= 275.)) , drop = True)[var_brom]
+    v_base = df.where(df['i_norm'] >= 300., drop = True)[var_brom]
 
-    v_mid = df.where(df['i_norm'] >= 75. , drop = True)
-    v_mid = v_mid.where(v_mid['i_norm'] <= 275., drop = True)
-    v_mid = v_mid[var_brom]
+    def get_mean(arr):
+        group =  arr.groupby('z') 
+        return group.mean(),group.min(),group.max()
 
-    v_base = df.where(df['i_norm'] >= 300., drop = True)
-    v_base = v_base[var_brom]
-  
-    for i in v_mid['i'].values:
-        for t in v_mid['time'].values:
-            v = v_mid.sel(time= t,i = i)
-            if is_sed == False:
-                axis.plot(v,v.z.values,'-',color = colr_mid, alpha = a,linewidth = ln)
-            elif is_sed == True:
-                axis.plot(v,sed,'-',color = colr_mid, alpha = a,linewidth = ln)
+    def fill(axis,arr,col,lab,is_sed):
+        if is_sed == False: z = arr.z   
+        elif is_sed == True: z = sed 
+            
+        arr_mean, arr_min, arr_max = get_mean(arr)
+        axis.plot(arr_mean,z,'-',color = col, alpha = 1,linewidth = 1,zorder = 5)
+        return (axis.fill_betweenx(z,arr_min,arr_max,
+                where = arr_max>= arr_min,color = col, alpha = a,label = lab))
 
-    '''for i in v_mid2['i'].values:
-        for t in v_mid2['time'].values:
-            v = v_mid2.sel(time= t,i = i)
-            if is_sed == False:
-                axis.plot(v,v.z.values,'-',color = colr_mid2, alpha = a,linewidth = ln)
-            elif is_sed == True:
-                axis.plot(v,sed,'-',color = colr_mid2, alpha = a,linewidth = ln)'''
-               
-    for i in v_base['i'].values:
-        for t in v_base['time'].values:
-            v = v_base.sel(time= t,i = i)
-            if is_sed == False:
-                axis.plot(v,v.z,'-',color = colr_base_field, alpha = a,linewidth = ln)
-            elif is_sed == True:
-                axis.plot(v,sed,'-',color = colr_base_field, alpha = a,linewidth = ln)
+    fill(axis,v_farm_0,colr_farm_0,'0m \nfrom farm',is_sed)
+    l1 = fill(axis,v_farm_50,colr_farm,'25-50m \nfrom farm',is_sed)
+    l2 = fill(axis,v_mid,colr_mid,'75-275m \nfrom farm',is_sed)     
+    l3 = fill(axis,v_base,colr_base,'300-500m \nfrom farm',is_sed)     
 
-    for i in v_farm['i'].values:
-        for t in v_farm['time'].values:
-            v = v_farm.sel(time= t,i = i)
-            if is_sed == False:
-                axis.plot(v,v.z.values,'-',color = colr_farm, alpha = a,linewidth = ln)
-            elif is_sed == True:
-                axis.plot(v,sed,'-',color = colr_farm, alpha = a,linewidth = ln)
+    return l1,l2,l3
 
-    if is_sed == True:
-        v_fa = v_farm.sel(time = v_farm['time'].values[0],i = v_farm.i.values[0])
-        v_ba = v_base.sel(time = v_base['time'].values[0],i = v_base.i.values[0])
-        v_mi = v_mid.sel(time = v_mid['time'].values[0],i = v_mid.i.values[0])
-        #v_mi2 = v_mid2.sel(time = v_mid2['time'].values[0],i = v_mid2.i.values[0])        
-        l1, = axis.plot(v_fa,sed,'-', color = colr_farm,alpha = 1,linewidth = 2,label = '0-50m \nfrom farm')
-        l2, = axis.plot(v_mi,sed,'-', color = colr_mid, alpha = 1,linewidth = 2,label = '75-275m \nfrom farm')  
-        #l3, = axis.plot(v_mi2,sed,'-', color = colr_mid2, alpha = 1,linewidth = 2,label = '125-200m \nfrom farm')                        
-        l3, = axis.plot(v_ba,sed,'-', color = colr_base_field,alpha = 1,linewidth = 2,label = '300-500m \nfrom farm')
-
-          
-        return l1,l2,l3 #,l4
 fig = plt.figure(figsize=(11.69, 8.27), dpi=100) 
 fig.set_facecolor('white') # specify background color
 
@@ -269,7 +231,6 @@ axes = (ax,ax2,ax4,ax6,ax8,ax10)
 # plot figure with observations and model for water and sediment     
 def plot_all(var_brom,var_water,var_sed1,var_sed2,title,axis,axis1):    
 
-
     water_ticks = np.arange(0, 301,50)                                             
     swi_ticks = np.arange(-3, 8, 1.5)   
     axis.set_yticks(water_ticks)     
@@ -287,14 +248,15 @@ def plot_all(var_brom,var_water,var_sed1,var_sed2,title,axis,axis1):
                  alpha = 0.4)        
      
     plot_brom(var_brom,axis, is_sed = False)
-    l1,l2,l3 = plot_brom(var_brom,axis1, is_sed = True)    #,l4     
+    l1,l2,l3 = plot_brom(var_brom,axis1, is_sed = True)  
 
     plot_water(var_water,axis,title)
-    plot_sed(var_sed1,depth200,axis1,addlabel = True)
-    plot_sed(var_sed2,depth199,axis1,addlabel = False)
+    sc3 = plot_sed(var_sed1,depth200,axis1,addlabel = '500m \nfrom farm') #200 488.34
+    sc4 = plot_sed(var_sed2,depth199,axis1,addlabel = '850m \nfrom farm') #199 847.88
     axis.set_title(title, y=1.08)
-    ax11.legend(title = 'Model data',handles=[l1,l2,l3]) #,l4
 
+    if var_brom != 'O2':
+        return sc3,sc4,l1,l2,l3
 
 
 plot_all('O2','O2uM',None,None,r'$ O_2\ \mu  M $',ax,ax1) 
@@ -302,15 +264,16 @@ plot_all('PO4','PO4uM',po4199,po4200,r'$ PO_4\ \mu  M $',ax2,ax3)
 plot_all('NO3','NO3uM',no3199,no3200,r'$ NO_3\ \mu  M $',ax4,ax5)
 plot_all('NH4','NH4uM',nh4199,nh4200,r'$ NH_4\ \mu  M $',ax6,ax7)
 plot_all('Alk',alk,alk199,alk200,r'$ Alk\ \mu  M $',ax8,ax9)  
-plot_all('DIC',tic,tic199,tic200,r'$ DIC\ \mu  M $',ax10,ax11)
+sc3,sc4,l1,l2,l3 = plot_all('DIC',tic,tic199,tic200,r'$ DIC\ \mu  M $',ax10,ax11)
 
 sc1 = int_and_plot(ax1,df_o2_2.o2,df_o2_2.depth,colr_farm,'k',addlabel = True)    
 int_and_plot(ax1,df_o2.o2,df_o2.depth,colr_farm,'k',addlabel = False) 
 
-sc2 = int_and_plot(ax1,df_o2_nf.o2,df_o2_nf.depth,colr_base_field,'k',addlabel = True)
-int_and_plot(ax1,df_o2_2_nf.o2,df_o2_2_nf.depth,colr_base_field,'k',addlabel = False)
-ax1.legend(title = 'Field data', handles=[sc1,sc2])
+sc2 = int_and_plot(ax1,df_o2_nf.o2,df_o2_nf.depth,colr_base,'k',addlabel = True)
+int_and_plot(ax1,df_o2_2_nf.o2,df_o2_2_nf.depth,colr_base,'k',addlabel = False)
 
+ax1.legend(title = 'Field data', handles=[sc1,sc2,sc3,sc4])
+ax11.legend(title = 'Model data',handles=[l1,l2,l3]) #,l4
 
 script_dir = os.path.dirname(__file__)
 results_dir = os.path.join(script_dir, 'Results/')    
